@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+</head>
+<body>
+    <form id="fileUploadForm" enctype="multipart/form-data">
+        <label for="csvFile">Select CSV File:</label>
+        <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
+        <br>
+        <button type="button" onclick="uploadFile()">Upload</button>
+    </form>
+
+    <script src="https://www.gstatic.com/firebasejs/9.4.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.4.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.4.1/firebase-storage.js"></script>
+
+    <script>
+        // Initialize Firebase with your config
+        const firebaseConfig = {
+  apiKey: "AIzaSyDcDFrcRLx9Uub3DJIHMJ3SQ2zd-dm_ar8",
+  authDomain: "bigdata-ffd07.firebaseapp.com",
+  projectId: "bigdata-ffd07",
+  storageBucket: "bigdata-ffd07.appspot.com",
+  messagingSenderId: "204016541424",
+  appId: "1:204016541424:web:b1ffbbcc7f871446d2ec35",
+  measurementId: "G-12YM5Y0CCB"
+};
+
+        firebase.initializeApp(firebaseConfig);
+
+        // Reference to your Firebase Storage
+        const storageRef = firebase.storage().ref();
+
+        // Reference to your Firebase Database
+        const databaseRef = firebase.database().ref('your-database-path');
+
+        function uploadCSVFile(file) {
+            const fileRef = storageRef.child(file.name);
+
+            fileRef.put(file).then(() => {
+                fileRef.getDownloadURL().then((url) => {
+                    databaseRef.push({
+                        filename: file.name,
+                        fileURL: url,
+                    });
+
+                    console.log('CSV file uploaded successfully!');
+                });
+            });
+        }
+
+        function uploadFile() {
+            const fileInput = document.getElementById('csvFile');
+
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                uploadCSVFile(file);
+            } else {
+                alert('Please select a file to upload.');
+            }
+        }
+    </script>
+</body>
+</html>
